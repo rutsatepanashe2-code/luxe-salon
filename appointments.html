@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Appointments | Luxe Beauty Salon</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Specific styling overrides for dashboard layouts if not covered by style.css */
+        .appointments-container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+        .appointment-card { background: #fff; border: 1px solid #ddd; padding: 20px; border-radius: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .appointment-info h2 { margin: 0 0 10px 0; color: #333; }
+        .appointment-meta { display: flex; gap: 15px; font-size: 0.95rem; color: #555; margin-bottom: 5px; }
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; text-transform: uppercase; }
+        .status-confirmed { background-color: #e6f4ea; color: #137333; }
+        .status-pending { background-color: #fef7e0; color: #b06000; }
+        .appointment-actions { display: flex; gap: 10px; }
+        .btn-reschedule { background-color: #333; color: #fff; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; text-decoration: none; font-size: 0.9rem; }
+        .btn-cancel { background-color: #fff; color: #d93025; border: 1px solid #d93025; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 0.9rem; }
+        .empty-state { text-align: center; padding: 60px 20px; border: 2px dashed #ccc; border-radius: 8px; background: #fafafa; display: none; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: #fff; padding: 30px; border-radius: 8px; max-width: 450px; width: 90%; text-align: center; }
+        .modal-buttons { display: flex; justify-content: center; gap: 15px; margin-top: 20px; }
+        .modal-form-group { margin: 15px 0; text-align: left; }
+        .modal-form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .modal-form-group input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        @media(max-width: 768px) {
+            .appointment-card { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .appointment-actions { width: 100%; }
+            .appointment-actions button, .appointment-actions a { flex: 1; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav>
+            <div class="logo">Luxe Beauty</div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="services.html">Services</a></li>
+                <li><a href="booking.html">Book Appointment</a></li>
+                <li><a href="appointments.html" class="active">My Appointments</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="services-intro">
+            <h1>My Appointments</h1>
+            <p>View, modify, or manage your scheduled grooming sessions with us.</p>
+        </section>
+
+        <div class="appointments-container">
+            <!-- Active Bookings Container -->
+            <div id="appointments-list">
+                
+                <!-- Mock Appointment 1 -->
+                <div class="appointment-card" id="apt-1">
+                    <div class="appointment-info">
+                        <h2>Box Braids</h2>
+                        <div class="appointment-meta">
+                            <span><strong>Date:</strong> 2026-10-15</span>
+                            <span><strong>Time:</strong> 10:00 AM</span>
+                        </div>
+                        <div class="appointment-meta">
+                            <span><strong>Stylist:</strong> Christabel</span>
+                            <span class="status-badge status-confirmed">Confirmed</span>
+                        </div>
+                    </div>
+                    <div class="appointment-actions">
+                        <button class="btn-reschedule" onclick="openRescheduleModal('apt-1', 'Box Braids', '2026-10-15', '10:00 AM')">Reschedule</button>
+                        <button class="btn-cancel" onclick="openCancelModal('apt-1')">Cancel</button>
+                    </div>
+                </div>
+
+                <!-- Mock Appointment 2 -->
+                <div class="appointment-card" id="apt-2">
+                    <div class="appointment-info">
+                        <h2>Men's Haircut</h2>
+                        <div class="appointment-meta">
+                            <span><strong>Date:</strong> 2026-10-22</span>
+                            <span><strong>Time:</strong> 02:30 PM</span>
+                        </div>
+                        <div class="appointment-meta">
+                            <span><strong>Stylist:</strong> Meme</span>
+                            <span class="status-badge status-pending">Pending</span>
+                        </div>
+                    </div>
+                    <div class="appointment-actions">
+                        <button class="btn-reschedule" onclick="openRescheduleModal('apt-2', 'Men\'s Haircut', '2026-10-22', '02:30 PM')">Reschedule</button>
+                        <button class="btn-cancel" onclick="openCancelModal('apt-2')">Cancel</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Empty State Context Screen -->
+            <div id="empty-state" class="empty-state">
+                <h2>No Appointments Found</h2>
+                <p>You have no current upcoming appointments scheduled at the moment.</p>
+                <a href="booking.html" class="book-btn" style="display:inline-block; margin-top:15px; text-decoration:none; padding: 10px 20px; background:#333; color:#fff; border-radius:4px;">Book an Appointment</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Cancellation Confirmation Modal -->
+    <div id="cancelModal" class="modal">
+        <div class="modal-content">
+            <h2>Cancel Appointment</h2>
+            <p>Are you sure you want to cancel this appointment? This action cannot be undone.</p>
+            <div class="modal-buttons">
+                <button class="btn-reschedule" onclick="closeModal('cancelModal')">No, Keep It</button>
+                <button class="btn-cancel" onclick="confirmCancellation()">Yes, Cancel Booking</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rescheduling Request Modal -->
+    <div id="rescheduleModal" class="modal">
+        <div class="modal-content">
+            <h2 id="rescheduleTitle">Reschedule Appointment</h2>
+            <form id="rescheduleForm" onsubmit="confirmReschedule(event)">
+                <div class="modal-form-group">
+                    <label for="newDate">Select New Date:</label>
+                    <input type="date" id="newDate" required>
+                </div>
+                <div class="modal-form-group">
+                    <label for="newTime">Select New Time:</label>
+                    <input type="time" id="newTime" required>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn-cancel" onclick="closeModal('rescheduleModal')">Go Back</button>
+                    <button type="submit" class="btn-reschedule">Update Schedule</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let targetedAptId = null;
+
+        // Front-end UI Action Handlers
+        function openCancelModal(appointmentId) {
+            targetedAptId = appointmentId;
+            document.getElementById('cancelModal').style.display = 'flex';
+        }
+
+        function openRescheduleModal(appointmentId, serviceName, currentDate, currentTime) {
+            targetedAptId = appointmentId;
+            document.getElementById('rescheduleTitle').innerText = `Reschedule ${serviceName}`;
+            
+            // Set constraints to prevent past date selections
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('newDate').min = today;
+            
+            document.getElementById('cancelModal').style.display = 'none';
+            document.getElementById('rescheduleModal').style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            targetedAptId = null;
+        }
+
+        function confirmCancellation() {
+            if (targetedAptId) {
+                const element = document.getElementById(targetedAptId);
+                element.remove();
+                closeModal('cancelModal');
+                checkEmptyState();
+                alert('Your appointment has been successfully cancelled.');
+            }
+        }
+
+        function confirmReschedule(e) {
+            e.preventDefault();
+            const dateVal = document.getElementById('newDate').value;
+            const timeVal = document.getElementById('newTime').value;
+            
+            if (targetedAptId && dateVal && timeVal) {
+                const card = document.getElementById(targetedAptId);
+                const metaElements = card.querySelectorAll('.appointment-meta span');
+                
+                metaElements[0].innerHTML = `<strong>Date:</strong> ${dateVal}`;
+                metaElements[1].innerHTML = `<strong>Time:</strong> ${timeVal}`;
+                
+                closeModal('rescheduleModal');
+                alert('Your appointment date and time has been requested to be updated.');
+            }
+        }
+
+        function checkEmptyState() {
