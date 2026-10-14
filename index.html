@@ -187,6 +187,29 @@
                 
                 closeModal('rescheduleModal');
                 alert('Your appointment date and time has been requested to be updated.');
+                <script>
+    // Function that runs when any 'Reschedule' button is clicked
+    function openRescheduleModal(appointmentId, serviceName, date, time) {
+        // For testing, this will pop up a browser alert with the specific data
+        alert("Rescheduling " + serviceName + " (ID: " + appointmentId + ") set for " + date + " at " + time);
+        
+        // Example: If you want to redirect them to your separate page instead:
+        // window.location.href = "reschedule.html";
+    }
+
+    // Function that runs when any 'Cancel' button is clicked
+    function openCancelModal(appointmentId) {
+        // Asks the user to confirm before proceeding
+        let confirmCancel = confirm("Are you sure you want to cancel appointment " + appointmentId + "?");
+        
+        if (confirmCancel) {
+            alert("Appointment " + appointmentId + " has been canceled.");
+            // Example: If you want to redirect them to your cancel page:
+            // window.location.href = "cancel.html";
+        }
+    }
+</script>
+
             }
         }
 
